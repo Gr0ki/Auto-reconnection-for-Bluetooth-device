@@ -27,6 +27,15 @@ def pair_device():
     command = 'bluetoothctl pair ' + MAC_ADDRESS
     return os.system(command)
 
+def attempts_to_pair(counter):
+# Recursive function decrementing the counter to 0, the rule may be broken if the attempt was successful
+    attempt_result = pair_device()
+    if counter > 1 and attempt_result != 0:
+        time.sleep(1)                               # Delay is for scanning (in child process)
+        return attempts_to_pair(counter - 1)
+    else:
+        return attempt_result
+
 def connect():
     command = 'bluetoothctl connect ' + MAC_ADDRESS
     _ = os.system(command)
@@ -35,32 +44,32 @@ def set_as_trusted():
     command = 'bluetoothctl trust ' + MAC_ADDRESS
     _ = os.system(command)
 
-def notification():
-    _ = os.system('notify-send -t 3000 "Script" "I did my work here, check the result."')
+def success_notification():
+    _ = os.system('notify-send -t 3000 "Script" "Success!"')
 
-def attempts_to_pair():
-    counter = 0
-    if pair_device() == 0 and counter >= 5:
-        return
+def failure_notification():
+    _ = os.system('notify-send -t 3000 "Script" "Failure!"')
+
+def select_notification(case):
+    if case == 0:
+        success_notification()
     else:
-        counter += 1
-        time.sleep(1)                   # Delay is for scanning (in child process)
-        return attempts_to_pair()
+        failure_notification()
 
 
 bluetooth_reboot()
-time.sleep(4)
+time.sleep(4)                                       # Delay is needed for bluetooth to turn on
 remove_device()
 
-pid = os.fork()                         # Fork is for ability to stop scanning for bluetooth devices
+pid = os.fork()                                     # Fork is for ability to stop scanning for bluetooth devices
 child_pid = 0
 if pid > 0:
     # Here is parent process
-    time.sleep(5)                       # Delay is for scanning (in child process)
-    attempts_to_pair()
+    time.sleep(5)                                   # Delay is for scanning (in child process)
+    command_result = attempts_to_pair(5)
     connect()
     set_as_trusted()
-    notification()
+    select_notification(command_result)
     command = 'kill '+ str(child_pid)
     os.system(command)
 else:
