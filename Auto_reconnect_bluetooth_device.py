@@ -40,7 +40,7 @@ def notification():
 
 def attempts_to_pair():
     counter = 0
-    if pair_device() == 0 and counter <= 5:
+    if pair_device() == 0 and counter >= 5:
         return
     else:
         counter += 1
