@@ -36,7 +36,7 @@ def set_as_trusted():
     _ = os.system(command)
 
 def notification():
-    _ = os.system('notify-send -t 3000 "Script" "I did my work here, check the result." --icon=/home/dr_xyz/Scripts/icons/172308_bluetooth_icon.png')
+    _ = os.system('notify-send -t 3000 "Script" "I did my work here, check the result.")
 
 def attempts_to_pair():
     counter = 0
