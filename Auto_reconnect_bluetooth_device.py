@@ -56,23 +56,25 @@ def select_notification(case):
     else:
         failure_notification()
 
+try:
+    bluetooth_reboot()
+    time.sleep(4)                                       # Delay is needed for bluetooth to turn on
+    remove_device()
 
-bluetooth_reboot()
-time.sleep(4)                                       # Delay is needed for bluetooth to turn on
-remove_device()
-
-pid = os.fork()                                     # Fork is for ability to stop scanning for bluetooth devices
-child_pid = 0
-if pid > 0:
-    # Here is parent process
-    time.sleep(5)                                   # Delay is for scanning (in child process)
-    command_result = attempts_to_pair(5)
-    connect()
-    set_as_trusted()
-    select_notification(command_result)
-    command = 'kill '+ str(child_pid)
-    os.system(command)
-else:
-    # Here is child process
-    child_pid = os.getpid()
-    scan_on()
+    pid = os.fork()                                     # Fork is for ability to stop scanning for bluetooth devices
+    child_pid = 0
+    if pid > 0:
+        # Here is parent process
+        time.sleep(5)                                   # Delay is for scanning (in child process)
+        command_result = attempts_to_pair(5)
+        connect()
+        set_as_trusted()
+        select_notification(command_result)
+        command = 'kill '+ str(child_pid)
+        os.system(command)
+    else:
+        # Here is child process
+        child_pid = os.getpid()
+        scan_on()
+except BaseException:
+    failure_notification()
