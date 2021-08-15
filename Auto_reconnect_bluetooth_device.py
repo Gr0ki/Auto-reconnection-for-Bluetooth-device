@@ -41,10 +41,11 @@ def notification():
 def attempts_to_pair():
     counter = 0
     if pair_device() == 0 and counter <= 5:
-        return attempts_to_pair()
+        return
     else:
         counter += 1
         time.sleep(1)                   # Delay is for scanning (in child process)
+        return attempts_to_pair()
 
 
 bluetooth_reboot()
